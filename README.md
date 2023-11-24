@@ -49,7 +49,7 @@ For more detailed information about SST, visit [sst.dev](https://sst.dev).
 Set up:
 - `HOSTED_ZONE`: For the custom domain in AWS Route53.
 - `USERNAME`, `PASSWORD`: For basic authorization.
-- `OWNER_ID`, `API_KEY`: For Lambda functions.
+- `OWNER_ID`: For Lambda functions.
 - `NOT_FOUND_LINK`, `BLANK_LINK`: For specific redirection scenarios.
 
 ### Deployment

@@ -55,7 +55,6 @@ export function APP({ stack, app }: StackContext) {
         bind: [eventsTable, urlsTable],
         environment: {
           ownerId: process.env.OWNER_ID || "",
-          apiKey: process.env.API_KEY || "",
           domainName,
           notFoundLink: process.env.NOT_FOUND_LINK || "",
           blankLink: process.env.BLANK_LINK || ""
