@@ -1,5 +1,5 @@
-import { RemovalPolicy } from "aws-cdk-lib/core";
-import { StackContext, Api, Table, Function } from "sst/constructs";
+import { Duration, RemovalPolicy } from "aws-cdk-lib/core";
+import { StackContext, Api, Table, Function, Service } from "sst/constructs";
 
 export function APP({ stack, app }: StackContext) {
   const eventsTable = new Table(stack, "Events", {
@@ -97,11 +97,39 @@ export function APP({ stack, app }: StackContext) {
     },
   });
 
+  const docsService = new Service(stack, "DocService", {
+    path: ".",
+    file: "./services/Dockerfile",
+    port: 80,
+    cdk: {
+      container: {
+        healthCheck: {
+          command: ["CMD-SHELL", "curl -f http://localhost || exit 1"],
+          interval: Duration.minutes(1),
+          retries: 2,
+          startPeriod: Duration.minutes(1),
+          timeout: Duration.seconds(30),
+        },
+      },
+      applicationLoadBalancerTargetGroup: {
+        healthCheck: {
+          healthyHttpCodes: "200,301,302",
+          path: "/",
+        },
+      }
+    },
+    customDomain: {
+      domainName: `docs.${app.name}.${app.stage}.${process.env.HOSTED_ZONE}`,
+      hostedZone: `${process.env.HOSTED_ZONE}`
+    }
+  });
+
   stack.addOutputs({
     eventsTableName: eventsTable.tableName,
     eventsTableArn: eventsTable.tableArn,
     linkRedirectorTableName: urlsTable.tableName,
     linkRedirectorTableArn: urlsTable.tableArn,
     ApiCustomDomain: api.customDomainUrl,
+    DocUrl: docsService.customDomainUrl
   });
 }
